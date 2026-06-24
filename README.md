@@ -513,7 +513,7 @@ MIT License — Educational use only.
 ## 👤 Author
 
 **Repository Created By:** Bipin Shrestha  
-**Based On:** MIT503 Information Security Course (Task 1)  
+**Focus Area:** Social Engineering & Human-Factor Security  
 **Last Updated:** June 2024  
 **Maintained For:** Security professionals, educators, students
 
