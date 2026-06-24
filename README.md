@@ -1,11 +1,11 @@
-# Lab 3: HTTP vs HTTPS Traffic Analysis with Wireshark
+# Lab 1: Social Engineering Attack – Credential Harvester with SET
 
-> **Network Security Lab | Kali Linux | Wireshark**  
+> **Ethical Hacking Lab | Kali Linux | Social Engineering Toolkit (SET)**  
 > Performed in a controlled environment for educational purposes only.
 
 ## Overview
 
-This lab uses **Wireshark** to compare unencrypted HTTP traffic against TLS-encrypted HTTPS traffic. The goal is to demonstrate how sensitive data such as URLs, credentials, and form submissions are exposed in plaintext over HTTP, while remaining completely hidden under HTTPS.
+This lab demonstrates how a credential harvester phishing attack works using the **Social Engineering Toolkit (SET)** on Kali Linux. The goal is to understand the mechanics of phishing attacks in order to build better defences.
 
 ---
 
@@ -13,138 +13,90 @@ This lab uses **Wireshark** to compare unencrypted HTTP traffic against TLS-encr
 
 | Tool | Purpose |
 |------|---------|
-| Kali Linux | Lab environment |
-| Wireshark | Network packet analyser |
-| neverssl.com | HTTP-only test site (no encryption) |
-| example.com | HTTPS test site (TLS encrypted) |
+| Kali Linux | Attack platform |
+| Social Engineering Toolkit (SET) | Phishing framework |
+| SET Credential Harvester | Captures submitted credentials |
+| Site Cloner | Clones a real login page |
 
 ---
 
-## Lab Walkthrough
+## Attack Walkthrough
+
+### Step 1 – Launch SET and Select Attack Vector
+
+SET was launched from the Kali Linux applications menu. The **Website Attack Vectors** option was selected — a purpose-built module for web-based phishing attacks.
+
+![SET menu and attack vector selection](screenshots/01-set-menu-attack-vectors.png)
 
 ---
 
-## Part 1 — HTTP Traffic (Unencrypted)
+### Step 2 – Choose Website Attack Method
 
-### Step 1 – Open Wireshark and Apply HTTP Filter
+From the web attack module, **Credential Harvester Attack Method** was selected. This method intercepts any data submitted via a cloned login form.
 
-Wireshark was launched on Kali Linux. The active network interface (`eth0`) was selected to begin packet capture. After visiting `neverssl.com`, the display filter `http` was applied to isolate HTTP packets only.
-
-![Wireshark HTTP filter applied](screenshots/01-wireshark-http-filter.png)
+![Website attack vectors menu](screenshots/02-website-attack-vectors.png)
 
 ---
 
-### Step 2 – HTTP Plaintext Exposed
+### Step 3 – Configure the Credential Harvester
 
-Inspecting the captured HTTP GET packet revealed all request data in **plaintext** — fully readable with no decryption needed. The following sensitive fields were visible:
+The Credential Harvester was configured to listen on the attacker's local IP address. SET was set to clone the target website automatically.
 
-- **Request URI** — the full URL being accessed
-- **Host Header** — the domain name of the site
-- **User-Agent Header** — the browser and OS details of the client
-
-![HTTP data exposed in plaintext](screenshots/02-http-plaintext-exposed.png)
+![Credential harvester configuration](screenshots/03-credential-harvester-method.png)
 
 ---
 
-### Step 3 – Full HTTP Request Visible
+### Step 4 – Clone the Target Site
 
-Expanding the Hypertext Transfer Protocol section in the Packet Details pane confirmed the complete HTTP request was readable — including the full request URI `http://neverssl.com/`. Any passive attacker on the same network could intercept and read this data with zero effort.
+The **Site Cloner** option was used to create a pixel-perfect copy of Instagram's login page. The cloned page was hosted on the attacker's machine and made accessible on the local network.
 
-![Full HTTP request details visible](screenshots/03-http-full-request-visible.png)
-
----
-
-### Step 4 – NeverSSL Website Visited
-
-`neverssl.com` was used as the HTTP traffic source — a site specifically designed to never use SSL/TLS, making it ideal for demonstrating plaintext HTTP vulnerability.
-
-![NeverSSL website in browser](screenshots/04-neverssl-website.png)
+![Site cloner options](screenshots/04-site-cloner-options.png)
 
 ---
 
-## Part 2 — HTTPS Traffic (TLS Encrypted)
+### Step 5 – Host the Phishing Page
 
-### Step 5 – Visit HTTPS Site (example.com)
+The fake Instagram page was hosted at the attacker's local IP address (`192.168.x.x`). To any user on the same network, it appears identical to the real Instagram login.
 
-A new Wireshark capture was started. `example.com` was visited, which triggers a TLS handshake and establishes an encrypted session before any data is transferred.
-
-![Example Domain HTTPS site](screenshots/05-https-example-domain.png)
+![Instagram clone being hosted](screenshots/05-instagram-clone-hosting.png)
 
 ---
 
-### Step 6 – Apply TLS Filter
+### Step 6 – Victim Visits the Phishing Page
 
-The Wireshark capture was stopped and the display filter `tls` was applied to isolate Transport Layer Security packets. The TLS handshake packets (Client Hello, Server Hello, etc.) were visible — but no actual content.
+The victim accessed the attacker's IP address from a separate machine. The cloned Instagram login page rendered convincingly.
 
-![TLS filter showing encrypted packets](screenshots/06-tls-filter-applied.png)
+![Instagram phishing page rendered](screenshots/06-instagram-phishing-page.png)
 
 ---
 
-### Step 7 – HTTPS Data Confirmed Encrypted
+### Step 7 – Credentials Captured
 
-Selecting an `Application Data` packet and expanding the Transport Layer Security section showed the payload explicitly marked as **Encrypted Application Data**. Wireshark can see the packets being exchanged but cannot read the content without the cryptographic key — confirming HTTPS protection is working.
+After the victim submitted their credentials, SET's Credential Harvester intercepted and displayed them in plaintext on the attacker's terminal — including username and password.
 
-![HTTPS encrypted data confirmed in Wireshark](screenshots/07-https-encrypted-data-confirmed.png)
+![Captured credentials displayed in terminal](screenshots/07-captured-credentials-terminal.png)
 
 ---
 
 ## Key Findings
 
-| | HTTP | HTTPS |
-|---|---|---|
-| **Data Visibility** | Fully readable in plaintext | Encrypted — unreadable without key |
-| **URL Exposed** | ✅ Yes | ❌ No |
-| **Credentials Exposed** | ✅ Yes | ❌ No |
-| **Vulnerable to Sniffing** | ✅ Yes | ❌ No |
-| **Protocol** | HTTP/1.1 | TLS 1.2 / TLS 1.3 |
-
-**Bottom line:** Any attacker on the same network (coffee shop Wi-Fi, shared LAN) can intercept all HTTP traffic in real time. HTTPS makes that interception useless — the data is encrypted end-to-end.
+- Credential harvesting via cloned sites is **highly effective** in local network scenarios
+- Victims cannot visually distinguish the fake page from the real one
+- Submitted data is captured in **plaintext** with no technical skill required beyond SET setup
 
 ---
 
 ## Prevention Methods
 
-| Type | Prevention Method | Description / Purpose |
+| Prevention Method | Description | Defence Against Site Cloner |
 |---|---|---|
-| **Technical** | **Use HTTPS Only** | Ensure all websites use HTTPS to encrypt data in transit. Redirect HTTP to HTTPS. |
-| **Technical** | **Enable HSTS** | Forces browsers to always use HTTPS, preventing downgrade to HTTP. |
-| **Technical** | **Strong TLS Configuration** | Disable outdated protocols (TLS 1.0/1.1) and weak ciphers. |
-| **Technical** | **VPN on Public Wi-Fi** | Encrypts all traffic, protecting it from local network sniffing. |
-| **Technical** | **Secure Network Infrastructure** | Use switches (not hubs), enable port security, apply ARP/DHCP protections. |
-| **User Practice** | **Verify HTTPS and Padlock Icon** | Check for secure HTTPS connections before entering credentials. |
-| **User Practice** | **Avoid Submitting Data Over HTTP** | Never enter login details or sensitive info on unencrypted websites. |
-| **User Practice** | **Use Password Managers** | They autofill only on legitimate, secure domains — won't fill on suspicious pages. |
-| **User Practice** | **Regular User Education** | Train users to identify secure sites and avoid unsafe online behaviour. |
-
----
-
-## Useful Wireshark Filters Reference
-
-```
-# Filter HTTP traffic only
-http
-
-# Filter HTTPS/TLS traffic only
-tls
-
-# Filter by specific host
-http.host == "neverssl.com"
-
-# Filter HTTP GET requests only
-http.request.method == "GET"
-
-# Filter HTTP POST requests (form submissions)
-http.request.method == "POST"
-
-# Show only TLS handshake packets
-tls.handshake
-
-# Filter by IP address
-ip.addr == 192.168.1.1
-```
+| **Multi-Factor Authentication (MFA)** | Requires a second factor like an app-based code or token | Even if credentials are harvested, login is prevented without the second factor |
+| **Password Manager Usage** | Auto-fills passwords only on correctly matched domains | Will not auto-fill on spoofed or IP-based domains, alerting the user |
+| **Web Browser Security** | Modern browsers flag insecure sites (HTTP) or untrusted certificates | Users are alerted if the cloned site lacks HTTPS or has invalid certificates |
+| **Email Gateway Filtering** | Filters incoming emails for spoofed domains, suspicious URLs, or phishing patterns | Prevents phishing emails from reaching the user in the first place |
 
 ---
 
 ## Disclaimer
 
-> This lab was conducted in a **controlled, isolated environment** for educational purposes as part of MIT503 Information Security coursework at NAPS. All traffic captured was generated by the lab participant on their own machine. No third-party traffic was intercepted or stored.
+> This lab was conducted in a **controlled, isolated environment** for educational purposes as part of MIT503 Information Security coursework at NAPS. No real credentials were compromised. The techniques demonstrated here should never be used outside of authorized penetration testing engagements.
