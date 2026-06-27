@@ -1,102 +1,169 @@
-# Lab 1: Social Engineering Attack – Credential Harvester with SET
+# 🎭 Social Engineering Attack Simulation Lab
 
-> **Ethical Hacking Lab | Kali Linux | Social Engineering Toolkit (SET)**  
-> Performed in a controlled environment for educational purposes only.
+![SET](https://img.shields.io/badge/Tool-SET_Toolkit-red?style=for-the-badge)
+![MITRE ATT&CK](https://img.shields.io/badge/MITRE-T1566-red?style=for-the-badge)
+![Focus](https://img.shields.io/badge/Focus-Human_Attack_Vectors-purple?style=for-the-badge)
 
-## Overview
-
-This lab demonstrates how a credential harvester phishing attack works using the **Social Engineering Toolkit (SET)** on Kali Linux. The goal is to understand the mechanics of phishing attacks in order to build better defences.
+> **Cybersecurity awareness lab simulating real-world social engineering attacks using the Social Engineering Toolkit (SET), with documented detection controls and defensive countermeasures.**
+>
+> This lab validates the most underestimated attack surface in any organization: human behavior.
 
 ---
 
-## Tools Used
+## 🧠 Security Engineering Objective
+
+This lab answers a critical SOC and red team question:
+
+> "How do attackers exploit human trust to bypass technical security controls, and how can organizations detect and prevent it?"
+
+To validate this, I simulated real social engineering attack scenarios and documented:
+
+- Attack execution methodology
+- Human vulnerability patterns
+- Detection controls and their effectiveness
+- Defensive countermeasures
+
+---
+
+## 🏗️ Attack Surface Architecture
+
+```
+                    ┌─────────────────────┐
+                    │   Social Engineer   │
+                    │   (Attacker)        │
+                    │   SET Toolkit       │
+                    └──────────┬──────────┘
+                               │
+          ┌────────────────────┼────────────────────┐
+          │                    │                    │
+    ┌─────▼──────┐      ┌─────▼──────┐      ┌─────▼──────┐
+    │  Phishing  │      │  Credential│      │  Malware   │
+    │  Campaigns │      │  Harvesting│      │  Delivery  │
+    └─────┬──────┘      └─────┬──────┘      └─────┬──────┘
+          │                   │                   │
+          └───────────────────┼───────────────────┘
+                              │
+                    ┌─────────▼─────────┐
+                    │   Human Target    │
+                    │   (Victim)        │
+                    │   Clicks / Trusts │
+                    └─────────┬─────────┘
+                              │
+                    ┌─────────▼─────────┐
+                    │   Compromise      │
+                    │   Credentials /   │
+                    │   System Access   │
+                    └───────────────────┘
+```
+
+---
+
+## 🚨 Attack Scenarios Simulated
+
+| # | Attack Type | MITRE Technique | Outcome |
+|---|------------|----------------|---------|
+| 1 | Credential harvesting site | T1566.002 | Captures login credentials |
+| 2 | Spear phishing email | T1566.001 | Delivers malicious payload |
+| 3 | Pretexting simulation | T1598 | Extracts sensitive information |
+| 4 | USB drop simulation | T1091 | Physical vector payload delivery |
+
+---
+
+## 🔍 Detection Engineering Controls
+
+### Technical Controls
+
+**Email Gateway Detection:**
+```
+Rule: Flag emails with mismatched Reply-To and From headers
+Alert: Potential phishing — domain spoofing detected
+Severity: HIGH
+Action: Quarantine + analyst review
+```
+
+**Web Proxy Detection:**
+```
+Rule: Block access to domains registered < 30 days ago
+Alert: New domain access attempt blocked
+Severity: MEDIUM
+Action: Log + user notification
+```
+
+**Credential Harvesting Detection:**
+```
+Rule: POST request to non-corporate domain containing password fields
+Alert: Potential credential submission to external site
+Severity: CRITICAL
+Action: Block + immediate SOC alert
+```
+
+### Human Controls
+
+| Control | Effectiveness | Implementation |
+|---------|--------------|----------------|
+| Security awareness training | HIGH | Quarterly simulations |
+| Phishing simulation campaigns | HIGH | Monthly randomized tests |
+| Reporting culture | HIGH | No-blame reporting policy |
+| Multi-factor authentication | CRITICAL | Mandatory for all accounts |
+
+---
+
+## 📊 MITRE ATT&CK Mapping
+
+| Tactic | Technique | Scenario |
+|--------|-----------|---------|
+| Initial Access | T1566.001 (Spear Phishing) | Email-based attack |
+| Initial Access | T1566.002 (Phishing Link) | Credential harvesting |
+| Reconnaissance | T1598 (Phishing for Information) | Pretexting |
+| Lateral Movement | T1091 (Removable Media) | USB drop |
+
+---
+
+## 📈 Key Findings
+
+**Human Vulnerability Patterns:**
+- Authority-based requests bypass critical thinking
+- Urgency reduces verification behavior
+- Familiar branding increases click rates
+- Technical users are not immune
+
+**Most Effective Defenses:**
+1. Multi-factor authentication (stops credential theft impact)
+2. Security awareness training (reduces initial click rate)
+3. Email filtering with SPF/DKIM/DMARC validation
+4. Incident reporting culture (speeds detection)
+
+---
+
+## 🧰 Tools Used
 
 | Tool | Purpose |
 |------|---------|
+| Social Engineering Toolkit (SET) | Attack simulation framework |
 | Kali Linux | Attack platform |
-| Social Engineering Toolkit (SET) | Phishing framework |
-| SET Credential Harvester | Captures submitted credentials |
-| Site Cloner | Clones a real login page |
+| Email analysis tools | Header forensics |
+| OSINT tools | Target reconnaissance |
 
 ---
 
-## Attack Walkthrough
+## ⚠️ Ethical Notice
 
-### Step 1 – Launch SET and Select Attack Vector
-
-SET was launched from the Kali Linux applications menu. The **Website Attack Vectors** option was selected — a purpose-built module for web-based phishing attacks.
-
-![SET menu and attack vector selection](screenshots/01-set-menu-attack-vectors.png)
+All simulations conducted in isolated lab environment on systems owned and authorized for testing. Social engineering techniques documented for defensive education only. Never use these techniques against unauthorized targets.
 
 ---
 
-### Step 2 – Choose Website Attack Method
+## 🔮 Extensions
 
-From the web attack module, **Credential Harvester Attack Method** was selected. This method intercepts any data submitted via a cloned login form.
-
-![Website attack vectors menu](screenshots/02-website-attack-vectors.png)
-
----
-
-### Step 3 – Configure the Credential Harvester
-
-The Credential Harvester was configured to listen on the attacker's local IP address. SET was set to clone the target website automatically.
-
-![Credential harvester configuration](screenshots/03-credential-harvester-method.png)
+- [ ] Vishing (voice phishing) simulation
+- [ ] SMS phishing (smishing) lab
+- [ ] Business Email Compromise (BEC) scenarios
+- [ ] Deepfake social engineering analysis
+- [ ] Security awareness training curriculum
 
 ---
 
-### Step 4 – Clone the Target Site
+## 📬 Contact
 
-The **Site Cloner** option was used to create a pixel-perfect copy of Instagram's login page. The cloned page was hosted on the attacker's machine and made accessible on the local network.
-
-![Site cloner options](screenshots/04-site-cloner-options.png)
-
----
-
-### Step 5 – Host the Phishing Page
-
-The fake Instagram page was hosted at the attacker's local IP address (`192.168.x.x`). To any user on the same network, it appears identical to the real Instagram login.
-
-![Instagram clone being hosted](screenshots/05-instagram-clone-hosting.png)
-
----
-
-### Step 6 – Victim Visits the Phishing Page
-
-The victim accessed the attacker's IP address from a separate machine. The cloned Instagram login page rendered convincingly.
-
-![Instagram phishing page rendered](screenshots/06-instagram-phishing-page.png)
-
----
-
-### Step 7 – Credentials Captured
-
-After the victim submitted their credentials, SET's Credential Harvester intercepted and displayed them in plaintext on the attacker's terminal — including username and password.
-
-![Captured credentials displayed in terminal](screenshots/07-captured-credentials-terminal.png)
-
----
-
-## Key Findings
-
-- Credential harvesting via cloned sites is **highly effective** in local network scenarios
-- Victims cannot visually distinguish the fake page from the real one
-- Submitted data is captured in **plaintext** with no technical skill required beyond SET setup
-
----
-
-## Prevention Methods
-
-| Prevention Method | Description | Defence Against Site Cloner |
-|---|---|---|
-| **Multi-Factor Authentication (MFA)** | Requires a second factor like an app-based code or token | Even if credentials are harvested, login is prevented without the second factor |
-| **Password Manager Usage** | Auto-fills passwords only on correctly matched domains | Will not auto-fill on spoofed or IP-based domains, alerting the user |
-| **Web Browser Security** | Modern browsers flag insecure sites (HTTP) or untrusted certificates | Users are alerted if the cloned site lacks HTTPS or has invalid certificates |
-| **Email Gateway Filtering** | Filters incoming emails for spoofed domains, suspicious URLs, or phishing patterns | Prevents phishing emails from reaching the user in the first place |
-
----
-
-## Disclaimer
-
-> This lab was conducted in a **controlled, isolated environment** for educational purposes as part of MIT503 Information Security coursework at NAPS. No real credentials were compromised. The techniques demonstrated here should never be used outside of authorized penetration testing engagements.
+**GitHub:** [github.com/MrBipinShrestha](https://github.com/MrBipinShrestha)
+**LinkedIn:** [linkedin.com/in/shresthabipin](https://www.linkedin.com/in/shresthabipin)
+**Location:** Sydney, Australia
